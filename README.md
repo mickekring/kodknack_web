@@ -103,8 +103,10 @@ that would require a custom `xcaddy` build for no benefit.
 
 Neither of these is part of a normal build; they were run once and are kept for provenance.
 
-The WordPress export itself is **not committed** — it carries author email addresses and this
-repo is public. Keep a copy alongside the checkout if you ever need to re-run the import.
+The WordPress export is **not kept**: it carries author email addresses, this repo is public,
+and `content/` has been the source of truth since the conversion. If the import ever needs to
+run again, take a fresh export from the WordPress site (Tools → Export) and drop it in the
+repo root — `.gitignore` already keeps `*.WordPress.*.xml` out of version control.
 
 ```sh
 python3 tools/import_wxr.py kodknck.WordPress.2026-08-22.xml   # WXR -> content/
