@@ -1,0 +1,39 @@
+# Coolify's proxy terminates TLS, so this listens on plain HTTP inside the container.
+:80 {
+	root * /srv
+	encode zstd gzip
+
+	header {
+		# The page loads nothing from anywhere else. The single third-party embed
+		# (a film at UR) is injected by a click, which is why frame-src is listed.
+		Content-Security-Policy "default-src 'self'; img-src 'self' data:; media-src 'self'; script-src 'self'; style-src 'self'; font-src 'self'; frame-src https://embed.ur.se; base-uri 'none'; form-action 'none'; frame-ancestors 'none'"
+		# Applies to whichever hostname served the response -- it is not tied to any
+		# domain baked into the build. Set HSTS_MAX_AGE=0 on a throwaway test hostname
+		# so browsers do not pin it to HTTPS for a year (0 also clears an existing pin).
+		Strict-Transport-Security "max-age={$HSTS_MAX_AGE:31536000}"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "geolocation=(), camera=(), microphone=()"
+		Cross-Origin-Opener-Policy "same-origin"
+		-Server
+	}
+
+	# Media and fonts are an archive: the bytes behind a given name never change.
+	@evig path /media/* /fonts/*
+	header @evig Cache-Control "public, max-age=31536000, immutable"
+
+	# Stylesheet and script are not content-hashed, so they must not be cached for long.
+	@kort path /css/* /js/* /favicon.svg
+	header @kort Cache-Control "public, max-age=3600"
+
+	# Pages revalidate, so a redeploy is visible immediately.
+	@sidor path / /*/
+	header @sidor Cache-Control "public, max-age=0, must-revalidate"
+
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+
+	file_server
+}

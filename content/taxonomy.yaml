@@ -1,0 +1,23 @@
+# Slug -> display name, lifted verbatim from the WordPress categories.
+concepts:
+  algoritm: "Algoritm"
+  felsokning: "Felsökning"
+  input-output: "Input / Output"
+  koordinatsystem: "Koordinatsystem"
+  monster: "Mönster"
+  problemlosning: "Problemlösning"
+  repetition: "Repetition"
+  simulera: "Simulera"
+  slump-random: "Slump (Random)"
+  sortering: "Sortering"
+  stegvisa-instruktioner: "Stegvisa Instruktioner"
+  symbolers-anvandning: "Symbolers användning"
+  variabler: "Variabler"
+  villkor: "Villkor"
+subjects:
+  ma: "MA"
+  tk: "TK"
+methods:
+  programmering-utan-dator: "Programmering utan dator"
+  textbaserad-programmering: "Textbaserad programmering"
+  visuell-programmering: "Visuell programmering"

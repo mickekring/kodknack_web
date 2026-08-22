@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="sv" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ .Title }}</title>
+<meta name="description" content="{{ .Description }}">
+<link rel="canonical" href="{{ .Canonical }}">
+<meta property="og:site_name" content="Kodknäck">
+<meta property="og:title" content="{{ .Title }}">
+<meta property="og:description" content="{{ .Description }}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="{{ .Canonical }}">
+{{- with .Doc }}{{ with .Image }}<meta property="og:image" content="{{ $.Site.BaseURL }}{{ . }}">{{ end }}{{ end }}
+<link rel="stylesheet" href="/css/fonts.css">
+<link rel="stylesheet" href="/css/kodknack.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#e23b26">
+</head>
+<body class="{{ if .Grade }}g{{ .Grade.N }}{{ end }}">
+<a class="hoppa" href="#innehall">Hoppa till innehållet</a>
+
+<header class="topp">
+  <div class="wrap topp-rad">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span><span></span></span>
+      <span class="brand-namn">Kodknäck</span>
+    </a>
+    <nav class="nav" aria-label="Huvudmeny">
+      <details class="nav-grupp">
+        <summary>Åk 0–3</summary>
+        <ul>{{ range .Site.Grades }}{{ if le .N 3 }}<li><a class="g{{ .N }}" href="{{ .URL }}"><i></i>{{ .Name }}</a></li>{{ end }}{{ end }}</ul>
+      </details>
+      <details class="nav-grupp">
+        <summary>Åk 4–6</summary>
+        <ul>{{ range .Site.Grades }}{{ if ge .N 4 }}<li><a class="g{{ .N }}" href="{{ .URL }}"><i></i>{{ .Name }}</a></li>{{ end }}{{ end }}</ul>
+      </details>
+      <a href="/progression/"{{ if eq .Section "progression" }} aria-current="page"{{ end }}>Progression</a>
+      <a href="/kontakt/"{{ if eq .Section "kontakt" }} aria-current="page"{{ end }}>Om Kodknäck</a>
+    </nav>
+  </div>
+</header>
+
+<main id="innehall">
+{{ block "content" . }}{{ end }}
+</main>
+
+<footer class="fot">
+  <div class="wrap fot-rad">
+    <p class="fot-om">
+      <strong>Kodknäck</strong> av Micke Kring och Jonas Johansson, från tiden på Årstaskolan.
+      Sajten uppdateras inte längre — den finns kvar för att lärare fortfarande använder den.
+    </p>
+    <p class="fot-licens">
+      Materialet delas enligt <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.sv" rel="license">CC&nbsp;BY-SA</a>
+      om inget annat anges. Sajten använder inga kakor och samlar inte in någon data.
+    </p>
+    <nav class="fot-lankar" aria-label="Sidfot">
+      <a href="/progression/">Progression</a>
+      <a href="/kontakt/">Om Kodknäck</a>
+      <a href="/integritetspolicy/">Integritet</a>
+    </nav>
+  </div>
+</footer>
+<script src="/js/site.js" defer></script>
+</body>
+</html>
+
+{{/* The progression rail: seven cells, one per årskurs. It is the site's own organising
+     idea made visible -- a Bee-Bot stepping across a mat, one square at a time. */}}
+{{ define "rail" }}
+<ol class="rail" aria-label="Årskurser">
+  {{ range .Site.Grades }}
+  <li class="g{{ .N }}{{ if and $.Grade (eq .N $.Grade.N) }} rail-har{{ end }}">
+    <a href="{{ .URL }}">
+      <span class="rail-siffra">{{ .N }}</span>
+      <span class="rail-etikett">Årskurs {{ .N }}</span>
+      {{ if and $.Grade (eq .N $.Grade.N) }}<span class="visuellt-dold">(du är här)</span>{{ end }}
+    </a>
+  </li>
+  {{ end }}
+</ol>
+{{ end }}
+
+{{/* One row in a list of activities. */}}
+{{ define "rad" }}
+<li class="rad">
+  <a href="{{ .URL }}">
+    <span class="rad-nr">{{ with .Number }}{{ . }}{{ else }}<i class="rad-prick" aria-hidden="true"></i>{{ end }}</span>
+    <span class="rad-titel">{{ .Label }}</span>
+  </a>
+</li>
+{{ end }}

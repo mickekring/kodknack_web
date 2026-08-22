@@ -1,0 +1,11 @@
+# Keep the build context to what the image actually needs.
+.git
+.github
+dist
+.work
+tools
+scripts
+CLAUDE.md
+README.md
+*.xml
+.DS_Store

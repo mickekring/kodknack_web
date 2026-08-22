@@ -1,0 +1,24 @@
+{{ define "content" }}
+<div class="wrap sid-topp">
+  {{ template "rail" . }}
+  <h1 class="sid-rubrik">{{ .Grade.Name }}</h1>
+  {{ with .Grade.Overview }}<p class="sid-ingress">{{ .Label }} — börja här om du inte gjort det förut.</p>{{ end }}
+</div>
+
+<div class="wrap">
+  <ol class="rader rader-stor">
+    {{ range .Grade.Docs }}
+    <li class="rad rad-kort">
+      <a href="{{ .URL }}">
+        {{ with .Image }}<img class="rad-bild" src="{{ . }}" alt="" width="120" height="80" loading="lazy" decoding="async">{{ end }}
+        <span class="rad-text">
+          <span class="rad-nr">{{ with .Number }}{{ . }}{{ else }}Översikt{{ end }}</span>
+          <span class="rad-titel">{{ .Label }}</span>
+          {{ if .Concepts }}<span class="rad-begrepp">{{ range concepts $.Site .Concepts }}<span class="pill pill-liten">{{ .Name }}</span>{{ end }}</span>{{ end }}
+        </span>
+      </a>
+    </li>
+    {{ end }}
+  </ol>
+</div>
+{{ end }}

@@ -1,0 +1,23 @@
+{{ define "content" }}
+<div class="wrap sid-topp">
+  <p class="ogonbryn">Begrepp</p>
+  <h1 class="sid-rubrik">{{ .Term.Name }}</h1>
+  <p class="sid-ingress">{{ len .Term.Docs }} aktiviteter arbetar med det här begreppet, från årskurs
+    {{ with index .Term.Docs 0 }}{{ .Grade }}{{ end }} och uppåt.</p>
+</div>
+<div class="wrap">
+  <ol class="rader rader-stor">
+    {{ range .Term.Docs }}
+    <li class="rad rad-kort g{{ .Grade }}">
+      <a href="{{ .URL }}">
+        {{ with .Image }}<img class="rad-bild" src="{{ . }}" alt="" width="120" height="80" loading="lazy" decoding="async">{{ end }}
+        <span class="rad-text">
+          <span class="rad-nr">Åk {{ .Grade }}{{ with .Number }} · {{ . }}{{ end }}</span>
+          <span class="rad-titel">{{ .Label }}</span>
+        </span>
+      </a>
+    </li>
+    {{ end }}
+  </ol>
+</div>
+{{ end }}

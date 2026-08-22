@@ -1,0 +1,15 @@
+# Generated output — rebuilt by cmd/build, produced inside the Docker image
+/dist/
+
+# One-time import + media staging (not part of the archive)
+/.work/
+
+# The WordPress export. Kept locally for provenance and for re-running the import, but
+# not committed: it carries author email addresses and the repo is public.
+*.WordPress.*.xml
+
+# OS noise
+.DS_Store
+
+# Stray binary if you run `go build ./...` instead of `go run`
+/build

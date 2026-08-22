@@ -1,0 +1,40 @@
+{{ define "content" }}
+<section class="hero">
+  <div class="wrap">
+    <p class="ogonbryn">Årstaskolan · 2016–2023</p>
+    <h1 class="hero-rubrik">Programmering och datalogiskt tänkande, <em>årskurs&nbsp;0–6</em></h1>
+    <p class="hero-ingress">
+      En progression för programmering i grundskolan, med lärarhandledning och färdiga
+      aktiviteter för varje årskurs. Begreppen är det viktiga — inte språket eller verktyget.
+    </p>
+    <p class="hero-fakta">
+      <span><strong>39</strong> aktiviteter</span>
+      <span><strong>7</strong> årskurser</span>
+      <span><strong>14</strong> begrepp</span>
+      <span>fri att använda</span>
+    </p>
+    {{ template "rail" . }}
+  </div>
+</section>
+
+<div class="wrap arskurser">
+  {{ range .Site.Grades }}
+  <section class="ak g{{ .N }}" id="ak-{{ .N }}">
+    <header class="ak-topp">
+      <h2><a href="{{ .URL }}">{{ .Name }}</a></h2>
+      <p class="ak-antal">{{ len .Docs }} sidor</p>
+    </header>
+    <ol class="rader">
+      {{ range .Docs }}{{ template "rad" . }}{{ end }}
+    </ol>
+  </section>
+  {{ end }}
+</div>
+
+<section class="wrap begreppsrad">
+  <h2 class="liten-rubrik">Begrepp och byggstenar</h2>
+  <ul class="pillrad">
+    {{ range .Site.Concepts }}<li><a class="pill pill-lank" href="{{ .URL }}">{{ .Name }} <span>{{ len .Docs }}</span></a></li>{{ end }}
+  </ul>
+</section>
+{{ end }}

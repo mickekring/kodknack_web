@@ -1,0 +1,44 @@
+{{ define "content" }}
+<article class="artikel">
+  <header class="wrap art-topp">
+    <nav class="smulor" aria-label="Brödsmulor">
+      <a href="/">Hem</a> <span aria-hidden="true">›</span>
+      <a href="{{ .Grade.URL }}">{{ .Grade.Name }}</a>
+    </nav>
+    {{ with .Doc.Number }}<p class="art-nr">Aktivitet {{ . }}</p>{{ end }}
+    <h1 class="art-rubrik">{{ .Doc.Label }}</h1>
+    <p class="art-meta">
+      {{ range $i, $a := .Doc.Authors }}{{ if $i }} · {{ end }}{{ $a }}{{ end }}
+    </p>
+    {{ if .Doc.Concepts }}
+    <ul class="pillrad art-begrepp">
+      {{ range concepts .Site .Doc.Concepts }}<li><a class="pill pill-lank" href="{{ .URL }}">{{ .Name }}</a></li>{{ end }}
+    </ul>
+    {{ end }}
+  </header>
+
+  {{ if .Doc.SyfteH }}
+  <div class="wrap">
+    <div class="flikar">
+      <input class="flik-in" type="radio" name="flik" id="flik-syfte" checked>
+      {{ if .Doc.LaroplanH }}<input class="flik-in" type="radio" name="flik" id="flik-laroplan">{{ end }}
+      {{ if .Doc.LaroplanH }}
+      <div class="flik-knappar" role="presentation">
+        <label for="flik-syfte">Syfte</label>
+        <label for="flik-laroplan">Läroplan</label>
+      </div>
+      {{ end }}
+      <div class="flik-panel" data-flik="syfte">{{ .Doc.SyfteH }}</div>
+      {{ if .Doc.LaroplanH }}<div class="flik-panel" data-flik="laroplan">{{ .Doc.LaroplanH }}</div>{{ end }}
+    </div>
+  </div>
+  {{ end }}
+
+  <div class="wrap brodtext">{{ .Doc.Body }}</div>
+</article>
+
+<nav class="wrap syskon" aria-label="Fler sidor i {{ .Grade.Name }}">
+  {{ with .Prev }}<a class="syskon-lank syskon-bak" href="{{ .URL }}"><span>Föregående</span><strong>{{ .Label }}</strong></a>{{ else }}<span></span>{{ end }}
+  {{ with .Next }}<a class="syskon-lank syskon-fram" href="{{ .URL }}"><span>Nästa</span><strong>{{ .Label }}</strong></a>{{ end }}
+</nav>
+{{ end }}

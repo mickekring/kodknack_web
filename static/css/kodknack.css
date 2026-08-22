@@ -1,0 +1,439 @@
+/* Kodknäck — an archive of programming activities for Swedish primary school.
+   The visual idea is the Bee-Bot mat: a grid the robot steps across one square at a
+   time. Årskurs 0–6 is that same stepping, drawn once as the progression rail and
+   echoed by the numbered step headings inside an activity. Grade colours walk the
+   Scratch block spectrum, so a teacher learns to recognise their year by hue. */
+
+:root {
+  --papper:      #f3f4ef;
+  --yta:         #ffffff;
+  --yta-2:       #eceee6;
+  --blackk:      #16181a;
+  --blackk-2:    #565d63;
+  --linje:       #d9dcd2;
+  --rod:         #e23b26;
+  --rod-mork:    #b52a18;
+
+  /* Årskurs 0 → 6 across the Scratch palette: events, motion, looks, operators. */
+  --ak0: #e8a020;  --ak1: #dd7526;  --ak2: #d0402f;  --ak3: #a8459f;
+  --ak4: #4f5fd0;  --ak5: #1f8ba6;  --ak6: #2f9350;
+  --ak: var(--rod);
+
+  --display: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --brod:    'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --mono:    'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --wrap: 68rem;
+  --text: 46rem;
+  --radie: 3px;
+  --skugga: 0 1px 0 var(--linje);
+}
+
+.g0 { --ak: var(--ak0) } .g1 { --ak: var(--ak1) } .g2 { --ak: var(--ak2) }
+.g3 { --ak: var(--ak3) } .g4 { --ak: var(--ak4) } .g5 { --ak: var(--ak5) }
+.g6 { --ak: var(--ak6) }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --papper: #14161a;  --yta: #1c1f24;  --yta-2: #23272d;
+    --blackk: #e9eaec;  --blackk-2: #9aa2ab;  --linje: #2e333a;
+    --rod: #ff6a52;     --rod-mork: #ff8b78;
+    --ak0: #f0b23f; --ak1: #ef8b41; --ak2: #ec5f4b; --ak3: #c56cbb;
+    --ak4: #7b88e6; --ak5: #3fadc9; --ak6: #4cb36e;
+    --skugga: 0 1px 0 var(--linje);
+  }
+}
+
+*, *::before, *::after { box-sizing: border-box }
+html { -webkit-text-size-adjust: 100% }
+body {
+  margin: 0;
+  background: var(--papper);
+  color: var(--blackk);
+  font-family: var(--brod);
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  font-synthesis-weight: none;
+}
+img, video { max-width: 100%; height: auto }
+a { color: inherit }
+:focus-visible { outline: 3px solid var(--rod); outline-offset: 2px; border-radius: 2px }
+.visuellt-dold {
+  position: absolute; width: 1px; height: 1px; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+.wrap { width: min(100% - 2.5rem, var(--wrap)); margin-inline: auto }
+
+.hoppa {
+  position: absolute; left: 0.75rem; top: -4rem; z-index: 50;
+  background: var(--rod); color: #fff; padding: 0.6rem 1rem;
+  font-family: var(--display); font-weight: 600; text-decoration: none;
+  border-radius: var(--radie); transition: top 0.15s;
+}
+.hoppa:focus { top: 0.75rem }
+
+/* ---------------------------------------------------------------- topplist */
+
+.topp {
+  background: var(--yta);
+  border-bottom: 1px solid var(--linje);
+  position: sticky; top: 0; z-index: 30;
+}
+.topp-rad { display: flex; align-items: center; gap: 1.5rem; min-height: 4rem }
+.brand {
+  display: inline-flex; align-items: center; gap: 0.6rem;
+  font-family: var(--display); font-weight: 700; font-size: 1.15rem;
+  letter-spacing: -0.02em; text-decoration: none; margin-right: auto;
+}
+/* Four cells: one square of the mat. */
+.brand-mark {
+  display: grid; grid-template-columns: repeat(2, 7px); gap: 2px;
+}
+.brand-mark span { width: 7px; height: 7px; background: var(--rod); border-radius: 1px }
+.brand-mark span:nth-child(2) { background: var(--ak3) }
+.brand-mark span:nth-child(3) { background: var(--ak5) }
+.brand-mark span:nth-child(4) { background: var(--ak0) }
+
+.nav { display: flex; align-items: center; gap: 0.35rem; flex-wrap: wrap }
+.nav > a, .nav summary {
+  font-family: var(--display); font-size: 0.9rem; font-weight: 500;
+  padding: 0.45rem 0.7rem; border-radius: var(--radie);
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+}
+.nav > a:hover, .nav summary:hover { background: var(--yta-2) }
+.nav > a[aria-current] { color: var(--rod); font-weight: 700 }
+.nav-grupp { position: relative }
+.nav-grupp summary { list-style: none; display: inline-flex; align-items: center; gap: 0.35rem }
+.nav-grupp summary::-webkit-details-marker { display: none }
+.nav-grupp summary::after {
+  content: ''; width: 5px; height: 5px; border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor; transform: translateY(-2px) rotate(45deg);
+}
+.nav-grupp[open] summary { background: var(--yta-2) }
+.nav-grupp ul {
+  position: absolute; top: calc(100% + 0.4rem); left: 0; z-index: 40;
+  margin: 0; padding: 0.35rem; list-style: none; min-width: 11rem;
+  background: var(--yta); border: 1px solid var(--linje);
+  border-radius: var(--radie); box-shadow: 0 8px 24px rgb(0 0 0 / 0.1);
+}
+.nav-grupp ul a {
+  display: flex; align-items: center; gap: 0.55rem; padding: 0.4rem 0.55rem;
+  font-family: var(--display); font-size: 0.9rem; text-decoration: none;
+  border-radius: 2px;
+}
+.nav-grupp ul a:hover { background: var(--yta-2) }
+.nav-grupp ul i { width: 9px; height: 9px; border-radius: 2px; background: var(--ak) }
+
+/* On a phone the header has to earn its space: tighter targets, and dropdowns that
+   open towards the middle instead of off the right edge. */
+@media (max-width: 46rem) {
+  .topp-rad { gap: 0.75rem; min-height: 3.5rem; flex-wrap: nowrap }
+  .brand-namn { font-size: 1rem }
+  .nav { gap: 0.1rem; flex-wrap: nowrap }
+  .nav > a, .nav summary { padding: 0.4rem 0.45rem; font-size: 0.82rem }
+  .nav-grupp ul { left: auto; right: 0; max-width: calc(100vw - 1.5rem) }
+}
+@media (max-width: 30rem) {
+  /* Progression and Om Kodknäck stay reachable from the footer. */
+  .nav > a { display: none }
+}
+
+/* ------------------------------------------------------------------- hero */
+
+.hero { padding: 4.5rem 0 1rem; }
+.ogonbryn {
+  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--blackk-2); margin: 0 0 1.25rem;
+}
+.hero-rubrik {
+  font-family: var(--display); font-weight: 700; letter-spacing: -0.035em;
+  font-size: clamp(2.25rem, 6.5vw, 4.25rem); line-height: 1.02;
+  margin: 0; max-width: 20ch; text-wrap: balance;
+}
+.hero-rubrik em { font-style: normal; color: var(--rod) }
+.hero-ingress {
+  max-width: 40rem; margin: 1.5rem 0 0; font-size: 1.15rem; color: var(--blackk-2);
+}
+.hero-fakta {
+  display: flex; flex-wrap: wrap; gap: 0.4rem 1.75rem; margin: 1.75rem 0 0;
+  font-family: var(--mono); font-size: 0.8rem; color: var(--blackk-2);
+}
+.hero-fakta strong { color: var(--blackk); font-weight: 500 }
+
+/* ---------------------------------------------------- the progression rail */
+
+.rail {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 2px; margin: 3rem 0 0; padding: 0; list-style: none;
+  background: var(--linje); border: 1px solid var(--linje);
+  border-radius: var(--radie); overflow: hidden;
+}
+.rail a {
+  display: block; background: var(--yta); padding: 1rem 0.5rem 0.9rem;
+  text-align: center; text-decoration: none; position: relative;
+  transition: transform 0.12s ease, background 0.12s ease;
+}
+.rail a::before {
+  content: ''; position: absolute; inset: 0 0 auto; height: 3px; background: var(--ak);
+}
+.rail-siffra {
+  display: block; font-family: var(--display); font-weight: 700;
+  font-size: clamp(1.5rem, 3.5vw, 2.1rem); line-height: 1; letter-spacing: -0.04em;
+  color: var(--ak);
+}
+.rail-etikett {
+  display: block; margin-top: 0.4rem; font-family: var(--mono);
+  font-size: 0.65rem; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--blackk-2);
+}
+/* Hover steps the cell forward, the way a Bee-Bot advances one square. */
+.rail a:hover { background: var(--yta-2); transform: translateY(-3px) }
+.rail-har a { background: var(--yta-2) }
+.rail-har a::before { height: 6px }
+@media (max-width: 40rem) {
+  .rail { grid-template-columns: repeat(4, 1fr) }
+  .rail-etikett { display: none }
+}
+
+/* ------------------------------------------------------------- grade lists */
+
+.arskurser {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(19rem, 1fr));
+  gap: 2.5rem 2rem; padding: 3.5rem 0;
+}
+.ak-topp {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: 1rem; padding-bottom: 0.6rem; border-bottom: 2px solid var(--ak);
+}
+.ak-topp h2 { font-family: var(--display); font-size: 1.15rem; letter-spacing: -0.02em; margin: 0 }
+.ak-topp h2 a { text-decoration: none }
+.ak-topp h2 a:hover { color: var(--ak) }
+.ak-antal { margin: 0; font-family: var(--mono); font-size: 0.7rem; color: var(--blackk-2) }
+
+.rader { list-style: none; margin: 0; padding: 0 }
+.rad a {
+  display: flex; gap: 0.85rem; align-items: baseline;
+  padding: 0.6rem 0.25rem; text-decoration: none;
+  border-bottom: 1px solid var(--linje);
+}
+.rad a:hover { background: var(--yta) }
+.rad a:hover .rad-titel { color: var(--ak) }
+.rad-nr {
+  flex: none; font-family: var(--mono); font-size: 0.75rem; font-variant-numeric: tabular-nums;
+  color: var(--blackk-2); min-width: 2.1rem;
+}
+.rad-prick { display: inline-block; width: 7px; height: 7px; border-radius: 2px; background: var(--ak) }
+.rad-titel { font-size: 0.98rem; line-height: 1.35 }
+
+.rader-stor .rad a { align-items: center; gap: 1.1rem; padding: 0.9rem 0.35rem }
+.rad-bild {
+  flex: none; width: 120px; height: 80px; object-fit: cover;
+  border-radius: var(--radie); background: var(--yta-2);
+}
+.rad-text { display: flex; flex-direction: column; gap: 0.25rem }
+.rader-stor .rad-titel { font-family: var(--display); font-size: 1.1rem; letter-spacing: -0.015em }
+.rad-begrepp { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.15rem }
+@media (max-width: 34rem) { .rad-bild { width: 76px; height: 56px } }
+
+/* ------------------------------------------------------------------- pills */
+
+.pill {
+  display: inline-block; padding: 0.2rem 0.55rem; border-radius: 100px;
+  font-family: var(--display); font-size: 0.75rem; font-weight: 500; line-height: 1.5;
+  background: var(--yta-2); color: var(--blackk-2); border: 1px solid var(--linje);
+}
+.pill-ak { background: var(--blackk); color: var(--papper); border-color: var(--blackk) }
+.pill-liten { font-size: 0.68rem; padding: 0.1rem 0.45rem }
+.pillrad { display: flex; flex-wrap: wrap; gap: 0.4rem; list-style: none; margin: 0; padding: 0 }
+a.pill-lank { text-decoration: none }
+a.pill-lank:hover { border-color: var(--ak); color: var(--ak) }
+a.pill-lank span { font-family: var(--mono); font-size: 0.65rem; opacity: 0.65 }
+.begreppsrad { padding: 0 0 4rem }
+.liten-rubrik {
+  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--blackk-2); font-weight: 400;
+  margin: 0 0 1rem; padding-top: 2rem; border-top: 1px solid var(--linje);
+}
+
+/* -------------------------------------------------------- page & article */
+
+.sid-topp { padding: 3rem 0 2rem }
+.sid-topp .rail { margin-top: 0; margin-bottom: 2.5rem }
+.sid-rubrik {
+  font-family: var(--display); font-weight: 700; letter-spacing: -0.035em;
+  font-size: clamp(2rem, 5vw, 3.25rem); line-height: 1.05; margin: 0;
+}
+.sid-ingress { max-width: 38rem; color: var(--blackk-2); margin: 1rem 0 0 }
+
+/* An article is one reading column: header, tabs and prose share a left edge and a
+   measure, so nothing appears to step in or out as you scroll. */
+.artikel .wrap, .syskon { width: min(100% - 2.5rem, var(--text)) }
+.art-topp { padding: 2.5rem 0 1.5rem; border-bottom: 3px solid var(--ak) }
+.smulor { font-family: var(--mono); font-size: 0.75rem; color: var(--blackk-2); margin-bottom: 1.5rem }
+.smulor a { text-decoration: none }
+.smulor a:hover { color: var(--ak) }
+.art-nr {
+  font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--ak); margin: 0 0 0.75rem;
+}
+.art-rubrik {
+  font-family: var(--display); font-weight: 700; letter-spacing: -0.035em;
+  font-size: clamp(1.9rem, 4.5vw, 3rem); line-height: 1.06; margin: 0;
+  max-width: 22ch; text-wrap: balance;
+}
+.art-meta { font-family: var(--mono); font-size: 0.78rem; color: var(--blackk-2); margin: 1rem 0 0 }
+.art-begrepp { margin-top: 1.1rem }
+
+/* ------------------------------------------------------------- css-only tabs */
+
+.flikar { max-width: var(--text); margin: 2rem 0 0 }
+.flik-in { position: absolute; opacity: 0; pointer-events: none }
+.flik-knappar { display: flex; gap: 0.25rem; border-bottom: 1px solid var(--linje) }
+.flik-knappar label {
+  font-family: var(--display); font-size: 0.9rem; font-weight: 500;
+  padding: 0.5rem 0.9rem; cursor: pointer; color: var(--blackk-2);
+  border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.flik-knappar label:hover { color: var(--blackk) }
+.flik-panel { display: none; padding: 1.25rem 0 0 }
+.flik-panel > :first-child { margin-top: 0 }
+#flik-syfte:checked ~ .flik-knappar label[for='flik-syfte'],
+#flik-laroplan:checked ~ .flik-knappar label[for='flik-laroplan'] {
+  color: var(--blackk); border-bottom-color: var(--ak);
+}
+#flik-syfte:checked ~ [data-flik='syfte'],
+#flik-laroplan:checked ~ [data-flik='laroplan'] { display: block }
+/* An activity with no Läroplan gets no tab bar, so its lead reads as a plain intro. */
+.flikar:not(:has(.flik-knappar)) .flik-panel { display: block; padding-top: 0 }
+.flik-in:focus-visible ~ .flik-knappar label[for='flik-syfte'],
+.flik-in:focus-visible ~ .flik-knappar label[for='flik-laroplan'] { outline: 3px solid var(--rod); outline-offset: 2px }
+
+/* ---------------------------------------------------------------- prose */
+
+.brodtext { max-width: var(--text); padding: 2.5rem 0 3rem; counter-reset: steg }
+.brodtext > :first-child { margin-top: 0 }
+.brodtext p { margin: 0 0 1.25rem }
+.brodtext a { color: var(--rod-mork); text-underline-offset: 2px }
+.brodtext a:hover { color: var(--rod) }
+.brodtext h2, .brodtext h3, .brodtext h4 {
+  font-family: var(--display); letter-spacing: -0.025em; line-height: 1.2;
+  margin: 2.5rem 0 0.85rem;
+}
+.brodtext h2 { font-size: 1.65rem }
+.brodtext h3 { font-size: 1.3rem }
+.brodtext h4 { font-size: 1.05rem; color: var(--blackk-2) }
+
+/* A numbered step heading is drawn as a cell on the mat. */
+.brodtext h2.steg { counter-increment: steg; display: flex; align-items: center; gap: 0.75rem }
+.brodtext h2.steg::before {
+  content: counter(steg, decimal-leading-zero);
+  flex: none; display: grid; place-items: center;
+  width: 2.1rem; height: 2.1rem; border-radius: var(--radie);
+  background: var(--ak); color: #fff;
+  font-family: var(--mono); font-size: 0.85rem; font-weight: 500; letter-spacing: 0;
+}
+.brodtext ul, .brodtext ol { margin: 0 0 1.25rem; padding-left: 1.35rem }
+.brodtext li { margin-bottom: 0.35rem }
+.brodtext figure { margin: 2rem 0 }
+.brodtext figure img { display: block; width: 100%; border-radius: var(--radie); background: var(--yta-2) }
+.brodtext figcaption {
+  font-family: var(--mono); font-size: 0.75rem; color: var(--blackk-2); margin-top: 0.6rem;
+}
+.brodtext .video video {
+  display: block; width: 100%; border-radius: var(--radie); background: var(--blackk);
+}
+.brodtext pre {
+  background: var(--yta); border: 1px solid var(--linje); border-left: 3px solid var(--ak);
+  border-radius: var(--radie); padding: 1rem 1.1rem; overflow-x: auto; margin: 1.5rem 0;
+}
+.brodtext code { font-family: var(--mono); font-size: 0.86em }
+.brodtext table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: 0.95rem }
+.brodtext td { border-bottom: 1px solid var(--linje); padding: 0.7rem 0.6rem; vertical-align: middle }
+.brodtext td img { width: 44px; height: auto; border-radius: 2px }
+.brodtext iframe { width: 100%; aspect-ratio: 16 / 9; border: 1px solid var(--linje); border-radius: var(--radie) }
+
+.fakta {
+  display: grid; gap: 0.5rem; margin: 1.75rem 0; padding: 1rem 1.1rem;
+  background: var(--yta); border: 1px solid var(--linje);
+  border-left: 3px solid var(--ak); border-radius: var(--radie);
+}
+.fakta-rad { display: flex; flex-wrap: wrap; gap: 0.4rem 0.75rem; align-items: baseline }
+.fakta-etikett {
+  flex: none; min-width: 5rem; font-family: var(--mono); font-size: 0.7rem;
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--blackk-2);
+}
+.fakta-varde { display: flex; flex-wrap: wrap; gap: 0.35rem; align-items: center; font-size: 0.92rem }
+.notis {
+  margin: 1.75rem 0; padding: 0.85rem 1.1rem; font-size: 0.9rem; color: var(--blackk-2);
+  background: var(--yta); border: 1px dashed var(--linje); border-radius: var(--radie);
+}
+
+/* ------------------------------------------------------------- prev / next */
+
+.syskon {
+  display: flex; gap: 1rem; justify-content: space-between;
+  padding: 0 0 4rem; margin-top: 1rem;
+}
+.syskon-lank {
+  display: flex; flex-direction: column; gap: 0.2rem; max-width: 20rem;
+  padding: 0.9rem 1.1rem; text-decoration: none;
+  background: var(--yta); border: 1px solid var(--linje); border-radius: var(--radie);
+}
+.syskon-lank:hover { border-color: var(--ak) }
+.syskon-lank span { font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--blackk-2) }
+.syskon-lank strong { font-family: var(--display); font-size: 0.98rem; font-weight: 500 }
+.syskon-fram { margin-left: auto; text-align: right }
+
+/* ------------------------------------------------------------------ footer */
+
+.fot { border-top: 1px solid var(--linje); background: var(--yta); padding: 2.5rem 0 3rem }
+.fot-rad { display: grid; gap: 1rem; max-width: 46rem }
+.fot p { margin: 0; font-size: 0.9rem; color: var(--blackk-2) }
+.fot-om strong { font-family: var(--display); color: var(--blackk) }
+.fot-lankar { display: flex; gap: 1.25rem; font-family: var(--display); font-size: 0.85rem }
+.fot-lankar a { text-decoration: none; color: var(--blackk-2) }
+.fot-lankar a:hover { color: var(--rod) }
+
+/* -------------------------------------------------------------- niceties */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important }
+}
+
+@media print {
+  .topp, .fot, .syskon, .rail, .hoppa { display: none }
+  body { background: #fff; font-size: 11pt }
+  .flik-panel { display: block !important }
+  .brodtext { max-width: none }
+  a[href^='/']::after { content: ' (kodknack.kringen.se' attr(href) ')'; font-size: 8pt }
+}
+
+/* Third-party embeds load on request only, so the page itself stays cookie-free. */
+.extern {
+  margin: 2rem 0; padding: 1.5rem; text-align: center;
+  background: var(--yta); border: 1px dashed var(--linje); border-radius: var(--radie);
+}
+.extern-text { margin: 0 0 1rem; font-size: 0.92rem; color: var(--blackk-2) }
+.extern-knappar { display: flex; gap: 1rem; align-items: center; justify-content: center;
+  flex-wrap: wrap; margin: 0 }
+.extern-knapp {
+  font-family: var(--display); font-size: 0.9rem; font-weight: 500;
+  padding: 0.55rem 1.1rem; border: 0; border-radius: var(--radie);
+  background: var(--ak); color: #fff; cursor: pointer;
+}
+.extern-knapp:hover { background: var(--blackk) }
+.extern-lank { font-family: var(--mono); font-size: 0.78rem; color: var(--blackk-2) }
+.extern iframe { display: block; width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: var(--radie) }
+
+/* Bee-Bot command symbols appear inline inside code sequences at the size the author
+   chose, so they read as notation rather than as illustrations. */
+.brodtext .ikon {
+  display: inline-block; vertical-align: middle; margin: 0 0.1em;
+  border-radius: 2px; background: transparent;
+}
+
+/* An image shown smaller than it really is opens at full size on click. */
+.brodtext .forstora { display: block; cursor: zoom-in; border-radius: var(--radie) }
+.brodtext .forstora:focus-visible { outline: 3px solid var(--rod); outline-offset: 3px }
+.brodtext .forstora:hover img { opacity: 0.92 }
