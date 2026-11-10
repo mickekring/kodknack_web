@@ -66,8 +66,13 @@ let the editor soft-wrap.
 
 ## Deploying
 
-Built and deployed as a Docker image on Coolify. The image is `caddy:alpine` plus `dist/` —
-the Go toolchain stays in the build stage.
+Built and deployed as a Docker image on Coolify. The image is `caddy:<version>-alpine` plus
+`dist/` — the Go toolchain stays in the build stage.
+
+**The site never changes, but its image ages.** Caddy and Alpine ship security fixes every
+few weeks, and they only reach the server when the image is rebuilt. The Caddy version is
+pinned in `Dockerfile`; Dependabot opens a PR when a new one is out — merge it and redeploy.
+The build also runs `apk upgrade`, so a rebuild picks up Alpine fixes published since.
 
 ```sh
 docker build -t kodknack .

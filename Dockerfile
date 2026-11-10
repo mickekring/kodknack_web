@@ -20,7 +20,12 @@ COPY media ./media
 ARG KODKNACK_BASE_URL=https://kodknack.kringen.se
 RUN KODKNACK_BASE_URL="$KODKNACK_BASE_URL" go run ./cmd/build
 
-FROM caddy:2-alpine
+# Pinned to an exact release, not a floating tag: a deploy server that already holds an
+# older "2-alpine" keeps building on it, which is how this image once shipped a Caddy three
+# months out of date. Dependabot proposes the bump when Caddy releases.
+FROM caddy:2.11.9-alpine
+# Alpine publishes security fixes between Caddy releases; take them at build time.
+RUN apk upgrade --no-cache
 COPY Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /src/dist /srv
 

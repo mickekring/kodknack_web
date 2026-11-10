@@ -1,0 +1,8 @@
+# The site's content is frozen, so nothing else would trigger a rebuild: without this the
+# Caddy base image goes stale and collects vulnerabilities. One PR per new release.
+version: 2
+updates:
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
